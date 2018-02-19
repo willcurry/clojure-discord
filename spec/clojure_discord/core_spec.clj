@@ -15,4 +15,9 @@
            (it "get-channel calls get-request"
               (with-redefs [get-request (stub :get-request)]
                 (get-channel "fake id")
-                (should-have-invoked :get-request {:with [(str base-url "channels/fake id")]}))))
+                (should-have-invoked :get-request {:with [(str base-url "channels/fake id")]})))
+
+            (it "get-channel-invites calls get-request"
+              (with-redefs [get-request (stub :get-request)]
+                (get-channel-invites "fake id")
+                (should-have-invoked :get-request {:with [(str base-url "channels/fake id/invites")]}))))

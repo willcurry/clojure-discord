@@ -8,7 +8,8 @@
 
 (def ^:private get-requests
   {:pinned-messages "channels/?/pins"
-   :channel "channels/?"})
+   :channel "channels/?"
+   :channel-invites "channels/?/invites"})
 
 (defn- add-base-url [end-url]
   (str base-url end-url))
@@ -28,3 +29,6 @@
 
 (defn get-channel [channel-id]
   (get-request (create-request (:channel get-requests) [channel-id])))
+
+(defn get-channel-invites [channel-id]
+  (get-request (create-request (:channel-invites get-requests) [channel-id])))
