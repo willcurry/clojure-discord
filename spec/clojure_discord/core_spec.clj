@@ -7,7 +7,12 @@
 (describe "discord"
           (with-stubs)
 
-          (it "call get request"
+          (it "get-pinned-messages calls get-request"
               (with-redefs [get-request (stub :get-request)]
                 (get-pinned-messages "fake id")
-                (should-have-invoked :get-request {:with [(str base-url "channels/fake id/pins")]}))))
+                (should-have-invoked :get-request {:with [(str base-url "channels/fake id/pins")]})))
+
+           (it "get-channel calls get-request"
+              (with-redefs [get-request (stub :get-request)]
+                (get-channel "fake id")
+                (should-have-invoked :get-request {:with [(str base-url "channels/fake id")]}))))

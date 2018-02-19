@@ -19,3 +19,7 @@
 (defn get-pinned-messages [channel-id]
   (let [end-url (str "channels/" channel-id "/pins")]
     (get-request (add-base-url end-url))))
+
+(defn get-channel [channel-id]
+  (let [end-url (str "channels/" channel-id)]
+    (get-request (add-base-url end-url))))
