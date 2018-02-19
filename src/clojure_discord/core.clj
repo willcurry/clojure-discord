@@ -11,6 +11,9 @@
    :channel "channels/?"
    :channel-invites "channels/?/invites"})
 
+(def ^:private put-requests
+  {:pin-message "channels/?/pins/?"})
+
 (defn- add-base-url [end-url]
   (str base-url end-url))
 
@@ -18,11 +21,14 @@
   (cond
     (not (clojure.string/includes? request "?")) (add-base-url request)
     :else
-      (recur (clojure.string/replace request "?" (first args)) (rest args))))
+      (recur (clojure.string/replace-first request "?" (first args)) (rest args))))
 
 (defn get-request [url]
   (json/read-str
     (:body (client/get url {:headers {"Authorization" (str "Bot " token)}}))))
+
+(defn put-request [url]
+  (:body (client/put url {:headers {"Authorization" (str "Bot " token)}})))
 
 (defn get-pinned-messages [channel-id]
   (get-request (create-request (:pinned-messages get-requests) [channel-id])))
@@ -32,3 +38,6 @@
 
 (defn get-channel-invites [channel-id]
   (get-request (create-request (:channel-invites get-requests) [channel-id])))
+
+(defn pin-message [channel-id message-id]
+  (put-request (create-request (:pin-message put-requests) [channel-id message-id])))

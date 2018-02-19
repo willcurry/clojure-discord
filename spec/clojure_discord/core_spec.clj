@@ -1,6 +1,6 @@
 (ns clojure-discord.core-spec
   (:require [speclj.core :refer :all]
-            [clojure-discord.core :as discord :refer :all]))
+            [clojure-discord.core :refer :all]))
 
 (def ^:private ^:const base-url "https://discordapp.com/api/v6/")
 
@@ -20,4 +20,9 @@
             (it "get-channel-invites calls get-request"
               (with-redefs [get-request (stub :get-request)]
                 (get-channel-invites "fake id")
-                (should-have-invoked :get-request {:with [(str base-url "channels/fake id/invites")]}))))
+                (should-have-invoked :get-request {:with [(str base-url "channels/fake id/invites")]})))
+
+            (it "pin-message calls put-request"
+              (with-redefs [put-request (stub :put-request)]
+                (pin-message "channel-id" "message-id")
+                (should-have-invoked :put-request {:with [(str base-url "channels/channel-id/pins/message-id")]}))))
