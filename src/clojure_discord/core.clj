@@ -1,20 +1,15 @@
 (ns clojure-discord.core
-  (:require [aero.core :refer (read-config)]
-            [clojure.data.json :as json]
+  (:require [clojure.data.json :as json]
             [clojure-discord.requests :as request]
+            [clojure-discord.discord :as discord]
             [clojure-discord.socket :as socket]))
 
-(def ^:private ^:const base-url "https://discordapp.com/api/v6/")
-(def ^:private ^:const token (:token (read-config "config.edn")))
 (def ^:private connection (atom nil))
 (def ^:private last-sequence-number (atom nil))
 (def ^:private session-id (atom nil))
 
-(defn- add-base-url [end-url]
-  (str base-url end-url))
-
 (defn- get-gateway []
-  (request/get (add-base-url "gateway/bot")))
+  (request/get (discord/add-base-url "gateway/bot")))
 
 (defn- keep-alive [time-between]
   (.start (Thread. (fn []
@@ -43,4 +38,4 @@
   (socket/set-handler-function handle-incoming-request)
   (let [new-connection (socket/create-connection (create-gateway-url))]
     (reset! connection new-connection)
-    (socket/identify-with-discord new-connection token)))
+    (socket/identify-with-discord new-connection discord/token)))
