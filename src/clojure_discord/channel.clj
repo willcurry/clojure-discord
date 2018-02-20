@@ -1,5 +1,5 @@
 (ns clojure-discord.channel
-  (:require [clojure-discord.core :refer :all]
+  (:require [clojure-discord.requests :as request]
             [clojure.data.json :as json]))
 
 (def ^:private get-requests
@@ -14,23 +14,26 @@
   {:trigger-typing "channels/?/typing"
    :create-message "channels/?/messages"})
 
+(defn current-time []
+  (str (System/currentTimeMillis)))
+
 (defn get-pinned-messages [channel-id]
-  (get-request (create-request (:pinned-messages get-requests) [channel-id])))
+  (request/get (request/prepare (:pinned-messages get-requests) [channel-id])))
 
 (defn get-channel [channel-id]
-  (get-request (create-request (:channel get-requests) [channel-id])))
+  (request/get (request/prepare (:channel get-requests) [channel-id])))
 
 (defn get-channel-invites [channel-id]
-  (get-request (create-request (:channel-invites get-requests) [channel-id])))
+  (request/get (request/prepare (:channel-invites get-requests) [channel-id])))
 
 (defn pin-message [channel-id message-id]
-  (put-request (create-request (:pin-message put-requests) [channel-id message-id])))
+  (request/put (request/prepare (:pin-message put-requests) [channel-id message-id])))
 
 (defn trigger-typing-indicator [channel-id]
-  (post-request (create-request (:trigger-typing post-requests) [channel-id]) ""))
+  (request/post (request/prepare (:trigger-typing post-requests) [channel-id]) ""))
 
 (defn create-message [channel-id text]
   (let [json (json/write-str {:content text
                               :nonce (current-time)
                               :tts false})]
-  (post-request (create-request (:create-message post-requests) [channel-id]) json)))
+  (request/post (request/prepare (:create-message post-requests) [channel-id]) json)))
