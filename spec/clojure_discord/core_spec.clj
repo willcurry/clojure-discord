@@ -41,10 +41,5 @@
             )
 
 (describe "core"
-          (with-stubs)
-
-          (it "get-gateway calls get-request"
-              (with-redefs [get-request (stub :get-request)]
-                (get-gateway)
-                (should-have-invoked :get-request {:with [(str base-url "gateway/bot")]})))
-          )
+          (it "create-request replaces question marks with args"
+              (should= (str base-url "fake/id/url/id2") (create-request "fake/?/url/?" ["id" "id2"]))))
