@@ -6,6 +6,7 @@
 
 (def ^:private ^:const base-url "https://discordapp.com/api/v6/")
 (def ^:private ^:const token (:token (read-config "config.edn")))
+(def ^:private connection (atom nil))
 
 (defn current-time []
   (str (System/currentTimeMillis)))
@@ -36,9 +37,18 @@
 (defn- get-gateway []
   (get-request (add-base-url "gateway/bot")))
 
+(defn- handle-incoming-request [json-payload]
+  (let [payload (json/read-str json-payload)
+        op (get payload "op")
+        data (get payload "d")
+        last-sequence-number (get payload "s")]
+    (cond (= op 10) (socket/keep-alive @connection last-sequence-number))))
+
 (defn- create-gateway-url []
   (str (get (get-gateway) "url") "?v=6&encoding=json"))
 
 (defn connect []
-  (let [connection (socket/create-connection (create-gateway-url))]
-    (socket/identify-with-discord connection token)))
+  (socket/set-handler-function handle-incoming-request)
+  (let [new-connection (socket/create-connection (create-gateway-url))]
+    (reset! connection new-connection)
+    (socket/identify-with-discord new-connection token)))
