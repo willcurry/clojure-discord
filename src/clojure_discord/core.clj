@@ -7,6 +7,7 @@
 (def ^:private ^:const base-url "https://discordapp.com/api/v6/")
 (def ^:private ^:const token (:token (read-config "config.edn")))
 (def ^:private connection (atom nil))
+(def ^:private last-sequence-number (atom nil))
 
 (defn current-time []
   (str (System/currentTimeMillis)))
@@ -37,15 +38,19 @@
 (defn- get-gateway []
   (get-request (add-base-url "gateway/bot")))
 
-(defn- keep-alive [last-sequence-number]
-  (socket/heartbeat @connection last-sequence-number))
+(defn- keep-alive [time-between]
+  (.start (Thread. (fn []
+             (socket/heartbeat @connection @last-sequence-number)
+             (Thread/sleep time-between)
+             (recur)))))
 
 (defn- handle-incoming-request [json-payload]
   (let [payload (json/read-str json-payload)
         op (get payload "op")
         data (get payload "d")
-        last-sequence-number (get payload "s")]
-    (cond (= op 10) (keep-alive last-sequence-number))))
+        sequence-number (get payload "s")]
+    (reset! last-sequence-number sequence-number)
+    (cond (= op 10) (keep-alive (get data "heartbeat_interval")))))
 
 (defn- create-gateway-url []
   (str (get (get-gateway) "url") "?v=6&encoding=json"))
