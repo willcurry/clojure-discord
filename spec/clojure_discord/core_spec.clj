@@ -1,10 +1,11 @@
 (ns clojure-discord.core-spec
   (:require [speclj.core :refer :all]
-            [clojure-discord.core :refer :all]))
+            [clojure-discord.core :refer :all]
+            [clojure-discord.channel :refer :all]))
 
 (def ^:private ^:const base-url "https://discordapp.com/api/v6/")
 
-(describe "discord"
+(describe "channel"
           (with-stubs)
 
           (it "get-pinned-messages calls get-request"

@@ -6,22 +6,10 @@
 (def ^:private ^:const base-url "https://discordapp.com/api/v6/")
 (def ^:private ^:const token (:token (read-config "config.edn")))
 
-(def ^:private get-requests
-  {:pinned-messages "channels/?/pins"
-   :channel "channels/?"
-   :channel-invites "channels/?/invites"})
-
-(def ^:private put-requests
-  {:pin-message "channels/?/pins/?"})
-
-(def ^:private post-requests
-  {:trigger-typing "channels/?/typing"
-   :create-message "channels/?/messages"})
-
 (defn- add-base-url [end-url]
   (str base-url end-url))
 
-(defn- create-request [request args]
+(defn create-request [request args]
   (cond
     (not (clojure.string/includes? request "?")) (add-base-url request)
     :else
@@ -39,24 +27,3 @@
 
 (defn post-request [url json]
   (:body (client/post url {:body json :headers {"Authorization" (str "Bot " token)}})))
-
-(defn get-pinned-messages [channel-id]
-  (get-request (create-request (:pinned-messages get-requests) [channel-id])))
-
-(defn get-channel [channel-id]
-  (get-request (create-request (:channel get-requests) [channel-id])))
-
-(defn get-channel-invites [channel-id]
-  (get-request (create-request (:channel-invites get-requests) [channel-id])))
-
-(defn pin-message [channel-id message-id]
-  (put-request (create-request (:pin-message put-requests) [channel-id message-id])))
-
-(defn trigger-typing-indicator [channel-id]
-  (post-request (create-request (:trigger-typing post-requests) [channel-id]) ""))
-
-(defn create-message [channel-id text]
-  (let [json (json/write-str {:content text
-                              :nonce (current-time)
-                              :tts false})]
-  (post-request (create-request (:create-message post-requests) [channel-id]) json)))
