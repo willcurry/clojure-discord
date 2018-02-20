@@ -4,4 +4,5 @@
 
 (defn -main
   [& args]
-  (discord/connect))
+  (discord/connect)
+  (channel/create-message "415199853845544971" "Hello!"))

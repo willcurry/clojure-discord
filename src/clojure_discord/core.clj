@@ -28,7 +28,10 @@
   (:body (client/put url {:headers {"Authorization" (str "Bot " token)}})))
 
 (defn post-request [url json]
-  (:body (client/post url {:body json :headers {"Authorization" (str "Bot " token)}})))
+  (:body (client/post url {:body json
+                           :headers {"Authorization" (str "Bot " token)}
+                           :content-type :json
+                           :accept :json})))
 
 (defn get-gateway []
   (get-request (add-base-url "gateway/bot")))
