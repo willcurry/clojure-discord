@@ -1,7 +1,8 @@
 (ns clojure-discord.core
   (:require [clj-http.client :as client]
             [aero.core :refer (read-config)]
-            [clojure.data.json :as json]))
+            [clojure.data.json :as json]
+            [gniazdo.core :as web-socket]))
 
 (def ^:private ^:const base-url "https://discordapp.com/api/v6/")
 (def ^:private ^:const token (:token (read-config "config.edn")))
@@ -31,3 +32,13 @@
 
 (defn get-gateway []
   (get-request (add-base-url "gateway/bot")))
+
+(defn connect []
+  (let [socket (web-socket/connect
+    (str (get (get-gateway) "url") "?v=6&encoding=json")
+    :on-receive #(prn 'received %))]
+  (web-socket/send-msg socket (json/write-str
+                                {:op 2, :d {"token" token
+                                            "properties" {"$os" "linux"
+                                                          "$browser" "clojure-discord"
+                                                          "$device" "clojure-discord"}}}))))
