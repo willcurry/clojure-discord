@@ -37,12 +37,15 @@
 (defn- get-gateway []
   (get-request (add-base-url "gateway/bot")))
 
+(defn- keep-alive [last-sequence-number]
+  (socket/heartbeat @connection last-sequence-number))
+
 (defn- handle-incoming-request [json-payload]
   (let [payload (json/read-str json-payload)
         op (get payload "op")
         data (get payload "d")
         last-sequence-number (get payload "s")]
-    (cond (= op 10) (socket/keep-alive @connection last-sequence-number))))
+    (cond (= op 10) (keep-alive last-sequence-number))))
 
 (defn- create-gateway-url []
   (str (get (get-gateway) "url") "?v=6&encoding=json"))

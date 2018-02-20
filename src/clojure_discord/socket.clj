@@ -19,9 +19,6 @@
 (defn set-handler-function [function]
   (reset! handler function))
 
-(defn- heartbeat [connection last-sequence-number]
+(defn heartbeat [connection last-sequence-number]
   (web-socket/send-msg connection (json/write-str {:op 1
                                                    :d last-sequence-number})))
-
-(defn keep-alive [connection last-sequence-number]
-  (heartbeat connection last-sequence-number))
