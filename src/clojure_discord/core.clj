@@ -11,7 +11,8 @@
 
 (defn create-request [request args]
   (cond
-    (not (clojure.string/includes? request "?")) (add-base-url request)
+    (not (clojure.string/includes? request "?"))
+      (add-base-url request)
     :else
       (recur (clojure.string/replace-first request "?" (first args)) (rest args))))
 
@@ -27,3 +28,6 @@
 
 (defn post-request [url json]
   (:body (client/post url {:body json :headers {"Authorization" (str "Bot " token)}})))
+
+(defn get-gateway []
+  (get-request (add-base-url "gateway/bot")))

@@ -39,3 +39,12 @@
                 (create-message "channel-id" "json")
                 (should-have-invoked :post-request {:with [(str base-url "channels/channel-id/messages") "{\"content\":\"json\",\"nonce\":1,\"tts\":false}"]})))
             )
+
+(describe "core"
+          (with-stubs)
+
+          (it "get-gateway calls get-request"
+              (with-redefs [get-request (stub :get-request)]
+                (get-gateway)
+                (should-have-invoked :get-request {:with [(str base-url "gateway/bot")]})))
+          )
