@@ -25,4 +25,10 @@
             (it "pin-message calls put-request"
               (with-redefs [put-request (stub :put-request)]
                 (pin-message "channel-id" "message-id")
-                (should-have-invoked :put-request {:with [(str base-url "channels/channel-id/pins/message-id")]}))))
+                (should-have-invoked :put-request {:with [(str base-url "channels/channel-id/pins/message-id")]})))
+
+             (it "trigger-typing-indicator calls post-request"
+              (with-redefs [post-request (stub :post-request)]
+                (trigger-typing-indicator "channel-id")
+                (should-have-invoked :post-request {:with [(str base-url "channels/channel-id/typing")]})))
+            )

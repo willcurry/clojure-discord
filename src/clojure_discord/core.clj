@@ -14,6 +14,9 @@
 (def ^:private put-requests
   {:pin-message "channels/?/pins/?"})
 
+(def ^:private post-requests
+  {:trigger-typing "channels/?/typing"})
+
 (defn- add-base-url [end-url]
   (str base-url end-url))
 
@@ -30,6 +33,9 @@
 (defn put-request [url]
   (:body (client/put url {:headers {"Authorization" (str "Bot " token)}})))
 
+(defn post-request [url]
+  (:body (client/post url {:headers {"Authorization" (str "Bot " token)}})))
+
 (defn get-pinned-messages [channel-id]
   (get-request (create-request (:pinned-messages get-requests) [channel-id])))
 
@@ -41,3 +47,6 @@
 
 (defn pin-message [channel-id message-id]
   (put-request (create-request (:pin-message put-requests) [channel-id message-id])))
+
+(defn trigger-typing-indicator [channel-id]
+  (post-request (create-request (:trigger-typing post-requests) [channel-id])))
