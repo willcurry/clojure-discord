@@ -15,7 +15,8 @@
   {:pin-message "channels/?/pins/?"})
 
 (def ^:private post-requests
-  {:trigger-typing "channels/?/typing"})
+  {:trigger-typing "channels/?/typing"
+   :create-message "channels/?/messages"})
 
 (defn- add-base-url [end-url]
   (str base-url end-url))
@@ -30,11 +31,14 @@
   (json/read-str
     (:body (client/get url {:headers {"Authorization" (str "Bot " token)}}))))
 
+(defn current-time []
+  (str (System/currentTimeMillis)))
+
 (defn put-request [url]
   (:body (client/put url {:headers {"Authorization" (str "Bot " token)}})))
 
-(defn post-request [url]
-  (:body (client/post url {:headers {"Authorization" (str "Bot " token)}})))
+(defn post-request [url json]
+  (:body (client/post url {:body json :headers {"Authorization" (str "Bot " token)}})))
 
 (defn get-pinned-messages [channel-id]
   (get-request (create-request (:pinned-messages get-requests) [channel-id])))
@@ -49,4 +53,10 @@
   (put-request (create-request (:pin-message put-requests) [channel-id message-id])))
 
 (defn trigger-typing-indicator [channel-id]
-  (post-request (create-request (:trigger-typing post-requests) [channel-id])))
+  (post-request (create-request (:trigger-typing post-requests) [channel-id]) ""))
+
+(defn create-message [channel-id text]
+  (let [json (json/write-str {:content text
+                              :nonce (current-time)
+                              :tts false})]
+  (post-request (create-request (:create-message post-requests) [channel-id]) json)))

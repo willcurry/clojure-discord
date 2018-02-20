@@ -30,5 +30,11 @@
              (it "trigger-typing-indicator calls post-request"
               (with-redefs [post-request (stub :post-request)]
                 (trigger-typing-indicator "channel-id")
-                (should-have-invoked :post-request {:with [(str base-url "channels/channel-id/typing")]})))
+                (should-have-invoked :post-request {:with [(str base-url "channels/channel-id/typing") ""]})))
+
+             (it "create-message calls post-request"
+              (with-redefs [post-request (stub :post-request)
+                            current-time (fn [] 1)]
+                (create-message "channel-id" "json")
+                (should-have-invoked :post-request {:with [(str base-url "channels/channel-id/messages") "{\"content\":\"json\",\"nonce\":1,\"tts\":false}"]})))
             )
