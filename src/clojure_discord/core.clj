@@ -8,6 +8,7 @@
 (def ^:private ^:const token (:token (read-config "config.edn")))
 (def ^:private connection (atom nil))
 (def ^:private last-sequence-number (atom nil))
+(def ^:private session-id (atom nil))
 
 (defn current-time []
   (str (System/currentTimeMillis)))
@@ -44,13 +45,18 @@
              (Thread/sleep time-between)
              (recur)))))
 
+(defn- handle-event [payload data]
+  (let [event (get payload "t")]
+    (cond (= event "READY") (reset! session-id (get data "session_id")))))
+
 (defn- handle-incoming-request [json-payload]
   (let [payload (json/read-str json-payload)
         op (get payload "op")
         data (get payload "d")
         sequence-number (get payload "s")]
     (reset! last-sequence-number sequence-number)
-    (cond (= op 10) (keep-alive (get data "heartbeat_interval")))))
+    (cond (= op 10) (keep-alive (get data "heartbeat_interval"))
+          (= op 0) (handle-event payload data))))
 
 (defn- create-gateway-url []
   (str (get (get-gateway) "url") "?v=6&encoding=json"))
