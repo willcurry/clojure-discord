@@ -8,25 +8,22 @@
 (describe "gateway"
           (with-stubs)
 
+          (defn redefines []
+            (with-redefs-fn {#'socket/create-connection (stub :create-connection)
+                             #'request/get (stub :get-request)
+                             #'socket/identify-with-discord (stub :identify)}
+              gateway/connect))
+
           (it "gateway/connect calls create connection"
-              (with-redefs-fn {#'socket/create-connection (stub :create-connection)
-                               #'request/get (stub :get-request)
-                               #'socket/identify-with-discord (stub :identify)}
-                               gateway/connect)
+                (redefines)
                 (should-have-invoked :create-connection))
 
           (it "gateway/connect calls get-request to find new gateway"
-              (with-redefs-fn {#'socket/create-connection (stub :create-connection)
-                               #'request/get (stub :get-request)
-                               #'socket/identify-with-discord (stub :identify)}
-                               gateway/connect)
+                (redefines)
                 (should-have-invoked :get-request {:with ["https://discordapp.com/api/v6/gateway/bot"]}))
 
           (it "gateway/connect calls create identify-with-discord"
-              (with-redefs-fn {#'socket/create-connection (stub :create-connection)
-                               #'request/get (stub :get-request)
-                               #'socket/identify-with-discord (stub :identify)}
-                               gateway/connect)
+                (redefines)
                 (should-have-invoked :identify))
 
           (it "handler function calls parser/parse"
