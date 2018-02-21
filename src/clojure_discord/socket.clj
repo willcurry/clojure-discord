@@ -24,6 +24,11 @@
 (defn update-ack [bool]
   (reset! ACK bool))
 
+(defn resume [connection session-id last-sequence-number token]
+  (web-socket/send-msg connection (json/write-str {"token" token
+                                                   "session_id" session-id
+                                                   "seq" last-sequence-number})))
+
 (defn heartbeat [connection last-sequence-number]
   (cond
     (true? @ACK) (do (update-ack false) (web-socket/send-msg connection (json/write-str {:op 1

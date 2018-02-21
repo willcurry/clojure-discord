@@ -31,4 +31,10 @@
               (with-redefs [web-socket/close (fn [connection])
                             web-socket/send-msg (fn [connection msg])]
                 (socket/heartbeat nil 1)
-                (should= "died" (socket/heartbeat nil 2)))))
+                (should= "died" (socket/heartbeat nil 2))))
+
+          (it "resume calls web-socket/send-msg"
+              (with-redefs-fn {#'web-socket/close (stub :close-socket)
+                               #'web-socket/send-msg (stub :send-msg)}
+                (fn [] (socket/resume nil "fake id" "123" "token")))
+                (should-have-invoked :send-msg {:with [nil "{\"token\":\"token\",\"session_id\":\"fake id\",\"seq\":\"123\"}"]})))
