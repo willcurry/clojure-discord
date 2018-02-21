@@ -21,8 +21,11 @@
 (defn set-handler-function [function]
   (reset! handler function))
 
+(defn update-ack [bool]
+  (reset! ACK bool))
+
 (defn heartbeat [connection last-sequence-number]
   (cond
-    (true? @ACK) (do (reset! ACK false) (web-socket/send-msg connection (json/write-str {:op 1
+    (true? @ACK) (do (update-ack false) (web-socket/send-msg connection (json/write-str {:op 1
                                                                                     :d last-sequence-number})))
     :else (web-socket/close connection)))

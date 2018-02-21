@@ -52,4 +52,20 @@
                                #'events/handle (stub :event-handle)
                                #'socket/set-handler-function (fn [function] (reset! handler-function function))}
                                (fn [] (gateway/connect) (@handler-function json-payload-ready)))
-                  (should-have-invoked :event-handle))))
+                  (should-have-invoked :event-handle)))
+
+          (def json-payload-ack
+            (json/write-str {:op 11
+                             :d {}
+                             :s 1
+                             :t nil}))
+
+          (it "handler function calls socket/update-ack when op code is 11"
+              (let [handler-function (atom nil)]
+              (with-redefs-fn {#'socket/create-connection (stub :create-connection)
+                               #'socket/identify-with-discord (stub :identify)
+                               #'request/get (stub :get-request)
+                               #'socket/update-ack (stub :update-ack)
+                               #'socket/set-handler-function (fn [function] (reset! handler-function function))}
+                               (fn [] (gateway/connect) (@handler-function json-payload-ack)))
+                  (should-have-invoked :update-ack))))

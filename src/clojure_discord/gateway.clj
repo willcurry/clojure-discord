@@ -25,6 +25,7 @@
   (let [parsed-payload (parser/parse json-payload)]
     (reset! last-sequence-number (:sequence-number parsed-payload))
     (cond (= (:op parsed-payload) 10) (keep-alive (get (:data parsed-payload) "heartbeat_interval"))
+          (= (:op parsed-payload) 11) (socket/update-ack true)
           (= (:op parsed-payload) 0) (events/handle parsed-payload))))
 
 (defn connect []
