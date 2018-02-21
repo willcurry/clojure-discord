@@ -15,11 +15,17 @@
 (defn- create-gateway-url []
   (str (get (get-gateway) "url") "?v=6&encoding=json"))
 
+(defn- reconnect []
+  (reset! connection (socket/create-connection (create-gateway-url)))
+  (socket/identify-with-discord @connection discord/token))
+
 (defn- keep-alive [time-between]
   (.start (Thread. (fn []
-             (socket/heartbeat @connection @last-sequence-number)
-             (Thread/sleep time-between)
-             (recur)))))
+             (cond
+               (= "alive" (socket/heartbeat @connection @last-sequence-number)) (do
+                                                                                  (Thread/sleep time-between)
+                                                                                  (recur))
+               :else (reconnect))))))
 
 (defn- handle-incoming-request [json-payload]
   (let [parsed-payload (parser/parse json-payload)]

@@ -27,5 +27,5 @@
 (defn heartbeat [connection last-sequence-number]
   (cond
     (true? @ACK) (do (update-ack false) (web-socket/send-msg connection (json/write-str {:op 1
-                                                                                    :d last-sequence-number})))
-    :else (web-socket/close connection)))
+                                                                                    :d last-sequence-number})) "alive")
+    :else (do (web-socket/close connection) "died")))
