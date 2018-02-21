@@ -8,7 +8,6 @@
 
 (def ^:private connection (atom nil))
 (def ^:private last-sequence-number (atom nil))
-(def ^:private session-id (atom nil))
 
 (defn- get-gateway []
   (request/get (discord/add-base-url "gateway/bot")))

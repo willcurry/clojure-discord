@@ -5,6 +5,8 @@
 (def handler
   (atom (fn [x] (print x))))
 
+(def ^:private ACK (atom true))
+
 (defn create-connection [url]
   (web-socket/connect url
                 :on-receive @handler))
@@ -20,5 +22,7 @@
   (reset! handler function))
 
 (defn heartbeat [connection last-sequence-number]
-  (web-socket/send-msg connection (json/write-str {:op 1
-                                                   :d last-sequence-number})))
+  (cond
+    (true? @ACK) (do (reset! ACK false) (web-socket/send-msg connection (json/write-str {:op 1
+                                                                                    :d last-sequence-number})))
+    :else (web-socket/close connection)))

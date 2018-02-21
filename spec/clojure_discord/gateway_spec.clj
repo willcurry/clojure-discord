@@ -38,11 +38,11 @@
                                (fn [] (gateway/connect) (@handler-function "fake-payload")))
                   (should-have-invoked :parse)))
 
-          (def fake-json-payload
+          (def json-payload-ready
             (json/write-str {:op 0
-                 :d "data"
-                 :s 1
-                 :t "READY"}))
+                             :d {}
+                             :s 1
+                             :t "READY"}))
 
           (it "handler function calls events/handle when op code is 0"
               (let [handler-function (atom nil)]
@@ -51,5 +51,5 @@
                                #'request/get (stub :get-request)
                                #'events/handle (stub :event-handle)
                                #'socket/set-handler-function (fn [function] (reset! handler-function function))}
-                               (fn [] (gateway/connect) (@handler-function fake-json-payload)))
+                               (fn [] (gateway/connect) (@handler-function json-payload-ready)))
                   (should-have-invoked :event-handle))))
