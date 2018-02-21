@@ -1,4 +1,4 @@
-(ns clojure-discord.core
+(ns clojure-discord.gateway
   (:require [clojure.data.json :as json]
             [clojure-discord.requests :as request]
             [clojure-discord.discord :as discord]
@@ -13,14 +13,14 @@
 (defn- get-gateway []
   (request/get (discord/add-base-url "gateway/bot")))
 
+(defn- create-gateway-url []
+  (str (get (get-gateway) "url") "?v=6&encoding=json"))
+
 (defn- keep-alive [time-between]
   (.start (Thread. (fn []
              (socket/heartbeat @connection @last-sequence-number)
              (Thread/sleep time-between)
              (recur)))))
-
-(defn- create-gateway-url []
-  (str (get (get-gateway) "url") "?v=6&encoding=json"))
 
 (defn- handle-incoming-request [json-payload]
   (let [parsed-payload (parser/parse json-payload)]
