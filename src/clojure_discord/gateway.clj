@@ -30,6 +30,5 @@
 
 (defn connect []
   (socket/set-handler-function handle-incoming-request)
-  (let [new-connection (socket/create-connection (create-gateway-url))]
-    (reset! connection new-connection)
-    (socket/identify-with-discord new-connection discord/token)))
+    (reset! connection (socket/create-connection (create-gateway-url)))
+    (socket/identify-with-discord @connection discord/token))
