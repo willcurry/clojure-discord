@@ -21,14 +21,16 @@
 (defn- create-gateway-url []
   (str (get (get-gateway) "url") "?v=6&encoding=json"))
 
-(defn- handle-event [event data]
-  (cond (= event "READY") (reset! session-id (get data "session_id"))))
+(defn- handle-event [parsed-payload]
+  (let [event (:event parsed-payload)
+        data (:data parsed-payload)]
+  (cond (= event "READY") (reset! session-id (get data "session_id")))))
 
 (defn- handle-incoming-request [json-payload]
   (let [parsed-payload (parser/parse json-payload)]
     (reset! last-sequence-number (:sequence-number parsed-payload))
     (cond (= (:op parsed-payload) 10) (keep-alive (get (:data parsed-payload) "heartbeat_interval"))
-          (= (:op parsed-payload) 0) (handle-event (:event parsed-payload) (:data parsed-payload)))))
+          (= (:op parsed-payload) 0) (handle-event parsed-payload))))
 
 (defn connect []
   (socket/set-handler-function handle-incoming-request)
