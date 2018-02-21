@@ -31,5 +31,10 @@ View examples [here](https://github.com/willcurry/clojure-discord/tree/master/ex
 ## Functions and namespaces:
 
 Namespace    | Function      | Arguments
------------- | ------------- | -------------
+------------ | ------------- | ----------------------------------------
 channel      | create-message| *string* channel-id, *string* message
+channel      | pin-message| *string* channel-id, *string* message-id
+channel      | trigger-typing-indicator| *string* channel-id
+channel      | get-pinned-messages| *string* channel-id
+channel      | get-channel| *string* channel-id
+channel      | get-channel-invites| *string* channel-id
