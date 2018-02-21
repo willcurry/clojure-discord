@@ -3,6 +3,7 @@
             [clojure-discord.requests :as request]
             [clojure-discord.discord :as discord]
             [clojure-discord.parser :as parser]
+            [clojure-discord.events :as events]
             [clojure-discord.socket :as socket]))
 
 (def ^:private connection (atom nil))
@@ -21,16 +22,11 @@
 (defn- create-gateway-url []
   (str (get (get-gateway) "url") "?v=6&encoding=json"))
 
-(defn- handle-event [parsed-payload]
-  (let [event (:event parsed-payload)
-        data (:data parsed-payload)]
-  (cond (= event "READY") (reset! session-id (get data "session_id")))))
-
 (defn- handle-incoming-request [json-payload]
   (let [parsed-payload (parser/parse json-payload)]
     (reset! last-sequence-number (:sequence-number parsed-payload))
     (cond (= (:op parsed-payload) 10) (keep-alive (get (:data parsed-payload) "heartbeat_interval"))
-          (= (:op parsed-payload) 0) (handle-event parsed-payload))))
+          (= (:op parsed-payload) 0) (events/handle parsed-payload))))
 
 (defn connect []
   (socket/set-handler-function handle-incoming-request)
