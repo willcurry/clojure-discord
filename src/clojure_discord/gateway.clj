@@ -17,7 +17,8 @@
 
 (defn- reconnect []
   (reset! connection (socket/create-connection (create-gateway-url)))
-  (socket/identify-with-discord @connection discord/token))
+  (socket/identify-with-discord @connection discord/token)
+  (socket/resume @connection (events/get-session-id) @last-sequence-number discord/token))
 
 (defn- keep-alive [time-between]
   (.start (Thread. (fn []
